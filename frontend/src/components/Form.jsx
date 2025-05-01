@@ -2,18 +2,43 @@ import React, { useState } from "react";
 import { sendBulkEmail } from "../services/api";
 
 const Form = () => {
-  const [emails, setEmails] = useState("");
+  const [singleEmail, setSingleEmail] = useState("");
+  const [emailList, setEmailList] = useState([]);
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("");
 
+  const handleAddEmail = () => {
+    if (singleEmail && /\S+@\S+\.\S+/.test(singleEmail)) {
+      setEmailList([...emailList, singleEmail]);
+      setSingleEmail("");
+    } else {
+      setStatus("❌ Invalid email format");
+    }
+  };
+
+  const removeEmail = (index) => {
+    const newList = [...emailList];
+    newList.splice(index, 1);
+    setEmailList(newList);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const emailArray = emails.split(",").map((email) => email.trim());
+    if (emailList.length === 0) {
+      setStatus("⚠️ No emails added!");
+      return;
+    }
+    if (!message.trim()) {
+      setStatus("⚠️ Message can't be empty!");
+      return;
+    }
 
     try {
-      const result = await sendBulkEmail(emailArray, message);
+      const result = await sendBulkEmail(emailList, message);
       if (result.success) {
         setStatus("✅ Emails sent successfully!");
+        setEmailList([]);
+        setMessage("");
       } else {
         setStatus("❌ Email send failed.");
       }
@@ -27,14 +52,47 @@ const Form = () => {
       <h2 className="text-2xl font-bold mb-6 text-center text-blue-600">
         📤 Send Bulk Emails
       </h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="flex gap-2 mb-4">
         <input
-          type="text"
-          placeholder="Enter emails (comma separated)"
-          value={emails}
-          onChange={(e) => setEmails(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          type="email"
+          placeholder="Enter a single email"
+          value={singleEmail}
+          onChange={(e) => setSingleEmail(e.target.value)}
+          className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
+        <button
+          type="button"
+          onClick={handleAddEmail}
+          className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition"
+        >
+          ➕ Add
+        </button>
+      </div>
+
+      {emailList.length > 0 && (
+        <div className="mb-4">
+          <h4 className="font-semibold mb-2">📬 Emails to Send:</h4>
+          <ul className="space-y-1 max-h-32 overflow-y-auto border p-2 rounded-md bg-gray-50">
+            {emailList.map((email, index) => (
+              <li
+                key={index}
+                className="flex justify-between items-center text-sm bg-white px-3 py-1 border rounded"
+              >
+                <span>{email}</span>
+                <button
+                  type="button"
+                  onClick={() => removeEmail(index)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  ❌
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
         <textarea
           rows="6"
           placeholder="Enter your message"
@@ -46,9 +104,10 @@ const Form = () => {
           type="submit"
           className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300"
         >
-          🚀 Send Email
+          🚀 Send Email to {emailList.length} Recipients
         </button>
       </form>
+
       {status && (
         <p className="mt-4 text-center font-medium text-gray-700">{status}</p>
       )}
