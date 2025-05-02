@@ -1,6 +1,6 @@
 # 📬 BulkEmail App
 
-BulkEmail is a full-stack application that allows users to send a custom message to multiple Gmail addresses at once. It’s perfect for personal announcements, team updates, or small-scale outreach—without the complexity of enterprise tools. It also provide a opportunity to schedule a email for a later period of time.
+BulkEmail is a full-stack application that allows users to send a custom message to multiple Gmail addresses at once. It’s perfect for personal announcements, team updates, or small-scale outreach—without the complexity of enterprise tools. It also provide a option to schedule a email for a later period of time.
 
 ## 🚀 Tech Stack
 
