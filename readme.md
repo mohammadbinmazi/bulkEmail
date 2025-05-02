@@ -19,5 +19,6 @@ BulkEmail is a full-stack application that allows users to send a custom message
 - 📤 Send emails in bulk with one click
 - 🔐 Secure email sending using environment variables
 - 📊 Real-time success/failure feedback
+- 🕒 Schedule emails to be sent at a later date & time.
 
 ---
