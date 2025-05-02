@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import { sendBulkEmail } from "../services/api";
+import { sendBulkEmail, scheduleBulkEmail } from "../services/api";
 
 const Form = () => {
   const [singleEmail, setSingleEmail] = useState("");
   const [emailList, setEmailList] = useState([]);
-  const [subject, setSubject] = useState(""); // 🆕 Subject state
+  const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("");
+  const [sendOption, setSendOption] = useState("now"); // "now" or "schedule"
+  const [sendAt, setSendAt] = useState(""); // ISO datetime string
 
   const handleAddEmail = () => {
     if (singleEmail && /\S+@\S+\.\S+/.test(singleEmail)) {
@@ -25,6 +27,8 @@ const Form = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setStatus("");
+
     if (emailList.length === 0) {
       setStatus("⚠️ No emails added!");
       return;
@@ -38,18 +42,35 @@ const Form = () => {
       return;
     }
 
+    if (sendOption === "schedule" && !sendAt) {
+      setStatus("⚠️ Please choose a date and time to schedule the email.");
+      return;
+    }
+
     try {
-      const result = await sendBulkEmail(emailList, subject, message);
-      if (result.success) {
-        setStatus("✅ Emails sent successfully!");
-        setEmailList([]);
-        setSubject(""); // Clear subject
-        setMessage("");
+      let result;
+
+      if (sendOption === "now") {
+        result = await sendBulkEmail(emailList, subject, message);
       } else {
-        setStatus("❌ Email send failed.");
+        result = await scheduleBulkEmail(emailList, subject, message, sendAt);
+      }
+
+      if (result.success) {
+        setStatus(
+          `✅ Emails ${
+            sendOption === "now" ? "sent" : "scheduled"
+          } successfully!`
+        );
+        setEmailList([]);
+        setSubject("");
+        setMessage("");
+        setSendAt("");
+      } else {
+        setStatus("❌ Operation failed.");
       }
     } catch (error) {
-      setStatus("⚠️ Something went wrong while sending emails.");
+      setStatus("⚠️ Something went wrong.");
     }
   };
 
@@ -97,6 +118,46 @@ const Form = () => {
         </div>
       )}
 
+      {/* Send Options */}
+      <div className="mb-4">
+        <label className="block font-semibold mb-1">📅 Send Option:</label>
+        <div className="flex gap-4">
+          <label>
+            <input
+              type="radio"
+              value="now"
+              checked={sendOption === "now"}
+              onChange={() => setSendOption("now")}
+              className="mr-2"
+            />
+            Send Now
+          </label>
+          <label>
+            <input
+              type="radio"
+              value="schedule"
+              checked={sendOption === "schedule"}
+              onChange={() => setSendOption("schedule")}
+              className="mr-2"
+            />
+            Schedule
+          </label>
+        </div>
+      </div>
+
+      {/* Schedule Time Input */}
+      {sendOption === "schedule" && (
+        <div className="mb-4">
+          <label className="block font-semibold mb-1">⏰ Schedule Time:</label>
+          <input
+            type="datetime-local"
+            value={sendAt}
+            onChange={(e) => setSendAt(e.target.value)}
+            className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
+      )}
+
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
@@ -104,7 +165,7 @@ const Form = () => {
           placeholder="Enter email subject"
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         <textarea
@@ -119,7 +180,8 @@ const Form = () => {
           type="submit"
           className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300"
         >
-          🚀 Send Email to {emailList.length} Recipients
+          🚀 {sendOption === "now" ? "Send" : "Schedule"} Email to{" "}
+          {emailList.length} Recipient(s)
         </button>
       </form>
 
