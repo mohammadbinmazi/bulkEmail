@@ -4,6 +4,7 @@ import { sendBulkEmail } from "../services/api";
 const Form = () => {
   const [singleEmail, setSingleEmail] = useState("");
   const [emailList, setEmailList] = useState([]);
+  const [subject, setSubject] = useState(""); // 🆕 Subject state
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("");
 
@@ -28,16 +29,21 @@ const Form = () => {
       setStatus("⚠️ No emails added!");
       return;
     }
+    if (!subject.trim()) {
+      setStatus("⚠️ Subject can't be empty!");
+      return;
+    }
     if (!message.trim()) {
       setStatus("⚠️ Message can't be empty!");
       return;
     }
 
     try {
-      const result = await sendBulkEmail(emailList, message);
+      const result = await sendBulkEmail(emailList, subject, message);
       if (result.success) {
         setStatus("✅ Emails sent successfully!");
         setEmailList([]);
+        setSubject(""); // Clear subject
         setMessage("");
       } else {
         setStatus("❌ Email send failed.");
@@ -48,10 +54,8 @@ const Form = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-lg border border-gray-200">
-      <h2 className="text-2xl font-bold mb-6 text-center text-blue-600">
-        📤 Send Bulk Emails
-      </h2>
+    <div className="max-w-xl mx-auto mt-4 p-6 bg-white rounded-2xl shadow-lg border border-gray-200">
+      {/* Email Input */}
       <div className="flex gap-2 mb-4">
         <input
           type="email"
@@ -69,6 +73,7 @@ const Form = () => {
         </button>
       </div>
 
+      {/* Email List */}
       {emailList.length > 0 && (
         <div className="mb-4">
           <h4 className="font-semibold mb-2">📬 Emails to Send:</h4>
@@ -92,7 +97,16 @@ const Form = () => {
         </div>
       )}
 
+      {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+          type="text"
+          placeholder="Enter email subject"
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+
         <textarea
           rows="6"
           placeholder="Enter your message"
@@ -100,6 +114,7 @@ const Form = () => {
           onChange={(e) => setMessage(e.target.value)}
           className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
         ></textarea>
+
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300"
