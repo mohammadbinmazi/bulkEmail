@@ -1,70 +1,82 @@
+// const express = require("express");
+// const fs = require("fs");
+// const path = require("path");
+// const router = express.Router();
+// const transporter = require("../config/Transporter");
+
+// const scheduleFilePath = path.join(__dirname, "../data/scheduledEmails.json");
+
+// // Immediate email send
+// router.post("/send-emails", async (req, res) => {
+//   const { emails, subject, message } = req.body;
+
+//   if (!emails || !Array.isArray(emails) || emails.length === 0) {
+//     return res.status(400).json({ error: "No emails provided" });
+//   }
+
+//   try {
+//     const info = await Promise.all(
+//       emails.map((email) =>
+//         transporter.sendMail({
+//           from: `"Mohammad bin mazi" <${process.env.EMAIL_USER}>`,
+//           to: email,
+//           subject,
+//           text: message,
+//         })
+//       )
+//     );
+//     res.json({ success: true, details: info.map((i) => i.accepted[0]) });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Failed to send emails" });
+//   }
+// });
+
+// // Schedule email
+// router.post("/schedule-email", (req, res) => {
+//   const { emails, subject, message, sendAt } = req.body;
+
+//   if (!emails || !Array.isArray(emails) || !subject || !message || !sendAt) {
+//     return res
+//       .status(400)
+//       .json({ error: "Missing or invalid required fields" });
+//   }
+
+//   let scheduledEmails = [];
+//   try {
+//     if (fs.existsSync(scheduleFilePath)) {
+//       const data = fs.readFileSync(scheduleFilePath, "utf8");
+//       scheduledEmails = data ? JSON.parse(data) : [];
+//     }
+//   } catch (err) {
+//     return res.status(500).json({ error: "Error reading schedule file" });
+//   }
+
+//   emails.forEach((email) => {
+//     scheduledEmails.push({ email, subject, message, sendAt, sent: false });
+//   });
+
+//   try {
+//     fs.writeFileSync(
+//       scheduleFilePath,
+//       JSON.stringify(scheduledEmails, null, 2)
+//     );
+//     res.json({ success: true, message: "Emails scheduled successfully" });
+//   } catch (err) {
+//     res.status(500).json({ error: "Error writing to schedule file" });
+//   }
+// });
+
+// module.exports = router;
 const express = require("express");
-const fs = require("fs");
-const path = require("path");
+const {
+  sendEmailsNow,
+  scheduleEmails,
+} = require("../controllers/emailControllers");
+
 const router = express.Router();
-const transporter = require("../config/Transporter");
 
-const scheduleFilePath = path.join(__dirname, "../data/scheduledEmails.json");
-
-// Immediate email send
-router.post("/send-emails", async (req, res) => {
-  const { emails, subject, message } = req.body;
-
-  if (!emails || !Array.isArray(emails) || emails.length === 0) {
-    return res.status(400).json({ error: "No emails provided" });
-  }
-
-  try {
-    const info = await Promise.all(
-      emails.map((email) =>
-        transporter.sendMail({
-          from: `"Mohammad bin mazi" <${process.env.EMAIL_USER}>`,
-          to: email,
-          subject,
-          text: message,
-        })
-      )
-    );
-    res.json({ success: true, details: info.map((i) => i.accepted[0]) });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to send emails" });
-  }
-});
-
-// Schedule email
-router.post("/schedule-email", (req, res) => {
-  const { emails, subject, message, sendAt } = req.body;
-
-  if (!emails || !Array.isArray(emails) || !subject || !message || !sendAt) {
-    return res
-      .status(400)
-      .json({ error: "Missing or invalid required fields" });
-  }
-
-  let scheduledEmails = [];
-  try {
-    if (fs.existsSync(scheduleFilePath)) {
-      const data = fs.readFileSync(scheduleFilePath, "utf8");
-      scheduledEmails = data ? JSON.parse(data) : [];
-    }
-  } catch (err) {
-    return res.status(500).json({ error: "Error reading schedule file" });
-  }
-
-  emails.forEach((email) => {
-    scheduledEmails.push({ email, subject, message, sendAt, sent: false });
-  });
-
-  try {
-    fs.writeFileSync(
-      scheduleFilePath,
-      JSON.stringify(scheduledEmails, null, 2)
-    );
-    res.json({ success: true, message: "Emails scheduled successfully" });
-  } catch (err) {
-    res.status(500).json({ error: "Error writing to schedule file" });
-  }
-});
+router.post("/send-emails", sendEmailsNow);
+router.post("/schedule-email", scheduleEmails);
 
 module.exports = router;
