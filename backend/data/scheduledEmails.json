@@ -1,0 +1,65 @@
+[
+  {
+    "email": "example1@gmail.com",
+    "subject": "Scheduled Meeting",
+    "message": "Reminder: Please join the Zoom call tomorrow.",
+    "sendAt": "2025-05-02T17:30:00+05:30",
+    "sent": true
+  },
+  {
+    "email": "example2@gmail.com",
+    "subject": "Scheduled Meeting",
+    "message": "Reminder: Please join the Zoom call tomorrow.",
+    "sendAt": "2025-05-02T17:30:00+05:30",
+    "sent": true
+  },
+  {
+    "email": "example1@gmail.com",
+    "subject": "Scheduled Meeting",
+    "message": "Reminder: Please join the Zoom call tomorrow.",
+    "sendAt": "2025-05-02T17:30:00+05:30",
+    "sent": true
+  },
+  {
+    "email": "example2@gmail.com",
+    "subject": "Scheduled Meeting",
+    "message": "Reminder: Please join the Zoom call tomorrow.",
+    "sendAt": "2025-05-02T17:30:00+05:30",
+    "sent": true
+  },
+  {
+    "email": "mohammadbinmazi8@gmail.com",
+    "subject": "Namaste from India",
+    "message": "Scheduled this in IST. Jai Hind 🇮🇳",
+    "sendAt": "2025-05-02T17:46:00+05:30",
+    "sent": true
+  },
+  {
+    "email": "mohammadbinmazi8@gmail.com",
+    "subject": "Namaste from India",
+    "message": "Scheduled this in IST. Jai Hind 🇮🇳",
+    "sendAt": "2025-05-02T17:51:00+05:30",
+    "sent": true
+  },
+  {
+    "email": "binmazimohammad8@gmail.com",
+    "subject": "hello",
+    "message": "hello",
+    "sendAt": "2025-05-02T18:02",
+    "sent": true
+  },
+  {
+    "email": "mohammadbinmazi8@gmail.com",
+    "subject": "hello",
+    "message": "hello",
+    "sendAt": "2025-05-02T18:04",
+    "sent": true
+  },
+  {
+    "email": "mohammadbinmazi8@gmail.com",
+    "subject": "hello",
+    "message": "hello",
+    "sendAt": "2025-05-02T18:05",
+    "sent": true
+  }
+]
